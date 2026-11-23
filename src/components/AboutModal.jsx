@@ -1,4 +1,4 @@
-import { Check, Copy, ExternalLink, Flame, Gamepad2, Heart, Mail, Sparkles, Timer, Trophy, X } from 'lucide-react';
+import { Check, Copy, Flame, Gamepad2, Heart, Mail, Sparkles, Timer, Trophy, X } from 'lucide-react';
 import { AnimatePresence, m } from 'framer-motion';
 import { useState } from 'react';
 
@@ -83,17 +83,6 @@ export default function AboutModal({ open, onClose }) {
                       </button>
                     </div>
                   </div>
-                </div>
-                <div className="creator-links">
-                  <a
-                    href="https://github.com/vinnuthh/Hot-Potato"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="creator-link"
-                  >
-                    <span>View GitHub Repository</span>
-                    <ExternalLink size={13} />
-                  </a>
                 </div>
               </section>
 
