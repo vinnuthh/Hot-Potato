@@ -25,13 +25,24 @@ async function request(path, { method = 'GET', body, session } = {}) {
     headers['x-player-id'] = session.playerId;
     headers['x-session-token'] = session.token;
   }
-  const response = await fetch(`${API_BASE}/api${path}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE}/api${path}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    throw new Error('Cannot connect to server. Is the backend running?');
+  }
+
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || 'Something went wrong');
+  if (!response.ok) {
+    if (response.status === 404 && !data.error) {
+      throw new Error('Backend server not connected. Deploy the backend on Render/Railway and set VITE_API_URL on Vercel.');
+    }
+    throw new Error(data.error || 'Something went wrong');
+  }
   return data;
 }
 
