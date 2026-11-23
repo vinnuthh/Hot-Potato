@@ -1,15 +1,14 @@
 services:
-  # Always-on plan is recommended: a sleeping backend cannot resolve explosions.
   - type: web
     name: hot-potato-server
     runtime: node
-    plan: starter
+    plan: free
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
       - key: CORS_ORIGIN
-        value: https://hotpotato-ten.vercel.app
+        value: '*'
       - key: ROOM_TTL_HOURS
         value: 12
       - key: DISCONNECT_GRACE_MS
