@@ -1,4 +1,4 @@
-import { Check, Copy, ExternalLink, Flame, Gamepad2, Heart, Mail, Shield, Sparkles, Timer, Trophy, X } from 'lucide-react';
+import { Check, Copy, ExternalLink, Flame, Gamepad2, Heart, Mail, Sparkles, Timer, Trophy, X } from 'lucide-react';
 import { AnimatePresence, m } from 'framer-motion';
 import { useState } from 'react';
 
@@ -129,18 +129,6 @@ export default function AboutModal({ open, onClose }) {
                       <p>Outlast everyone else to take home the crown and claim survival victory!</p>
                     </div>
                   </div>
-                </div>
-              </section>
-
-              {/* Tech Highlights */}
-              <section className="about-section tech-section">
-                <h4>TECH ARCHITECTURE</h4>
-                <div className="tech-tags">
-                  <span className="tech-tag"><Shield size={12} /> Server-Authoritative Clock</span>
-                  <span className="tech-tag">⚡ Low-Latency WebSockets</span>
-                  <span className="tech-tag">⚛️ React 19 + Framer Motion</span>
-                  <span className="tech-tag">🛡️ SHA-256 Token Auth</span>
-                  <span className="tech-tag">☁️ Vercel + Render Cloud</span>
                 </div>
               </section>
             </div>
