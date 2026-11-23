@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Bomb from '../components/Bomb';
 import PlayerCard from '../components/PlayerCard';
 
-export default function Game({ state, me, actions }) {
+export default function Game({ state, me, actions, explosion }) {
   const game = state.game;
   const holder = state.players.find((player) => player.id === game?.holderId);
   const isHolder = game?.holderId === me.id;
@@ -35,7 +35,13 @@ export default function Game({ state, me, actions }) {
       </div>
 
       <div className="game-main">
-        <Bomb holderName={holder?.name} active={!isResolving} />
+        <Bomb
+          holderName={holder?.name}
+          active={!isResolving}
+          round={game?.round}
+          isHolder={isHolder}
+          explosion={explosion}
+        />
 
         <section className="panel pass-panel">
           <div className="pass-panel-head">

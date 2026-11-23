@@ -2,7 +2,7 @@ import { Eye, Heart, LogOut, Skull, Users } from 'lucide-react';
 import Bomb from '../components/Bomb';
 import PlayerCard from '../components/PlayerCard';
 
-export default function Spectator({ state, me, actions }) {
+export default function Spectator({ state, me, actions, explosion }) {
   const game = state.game;
   const holder = state.players.find((player) => player.id === game?.holderId);
 
@@ -17,7 +17,13 @@ export default function Spectator({ state, me, actions }) {
       </div>
 
       <div className="game-main">
-        <Bomb holderName={holder?.name} active={game?.status === 'ACTIVE'} />
+        <Bomb
+          holderName={holder?.name}
+          active={game?.status === 'ACTIVE'}
+          round={game?.round}
+          isHolder={false}
+          explosion={explosion}
+        />
         <section className="panel pass-panel">
           <div className="pass-panel-head">
             <div><span className="eyebrow">ROUND {game?.round ?? 1}</span><h2>Remaining players</h2></div>

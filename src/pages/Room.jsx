@@ -115,9 +115,9 @@ export default function Room() {
   } else if (state.status === 'FINISHED') {
     content = <Winner state={state} me={me} actions={roomActions} />;
   } else if (me.status === 'ELIMINATED') {
-    content = <Spectator state={state} me={me} actions={roomActions} />;
+    content = <Spectator state={state} me={me} actions={roomActions} explosion={explosion} />;
   } else {
-    content = <Game state={state} me={me} actions={roomActions} />;
+    content = <Game state={state} me={me} actions={roomActions} explosion={explosion} />;
   }
 
   return (
