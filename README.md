@@ -75,4 +75,15 @@ The bundled local server replaces Supabase for this build (your chosen option). 
 
 ## Deployment
 
-Build with `npm run build`, serve `dist/` as a static site (e.g. Vercel), and run `npm start` as the trusted backend. Point the frontend at the backend using `VITE_API_URL` and `VITE_WS_URL`. Keep the resolver process running continuously — it is the authority for explosions.
+The frontend and backend must both be publicly reachable — the static site alone cannot play.
+
+1. **Backend:** deploy the repo as a Node web service. `render.yaml` is a ready Render blueprint; Railway/Fly.io/VPS work the same way with `npm start` and `PORT`. Set `CORS_ORIGIN` to the exact frontend origin, e.g. `https://hotpotato-ten.vercel.app`.
+2. **Frontend:** deploy with `npm run build` / output `dist/` (`vercel.json` sets this up). In the host's environment variables set:
+   ```env
+   VITE_API_URL=https://your-backend.example.com
+   VITE_WS_URL=wss://your-backend.example.com
+   ```
+   Then rebuild/redeploy so the values are baked into the bundle.
+3. **Keep the backend awake.** A sleeping free tier cannot resolve overdue rounds. Use an always-on plan; `npm start` runs the authoritative resolver.
+
+A quick check: `GET https://your-backend.example.com/api/health` should return `{"ok":true,...}`. If the Vercel URL returns 404 on `/api/health`, only the frontend is live.

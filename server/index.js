@@ -22,6 +22,7 @@ import {
 const PORT = Number.parseInt(process.env.PORT, 10) || 3001;
 const GRACE_MS = Number.parseInt(process.env.DISCONNECT_GRACE_MS, 10) || 15000;
 const ROOM_TTL_MS = (Number.parseInt(process.env.ROOM_TTL_HOURS, 10) || 12) * 60 * 60 * 1000;
+const CORS_ORIGIN = process.env.CORS_ORIGIN?.trim() || '*';
 
 /** @type {Map<string, ReturnType<typeof createRoom>>} */
 const rooms = new Map();
@@ -266,6 +267,17 @@ async function handleApi(req, res, pathname) {
 }
 
 const server = http.createServer(async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', CORS_ORIGIN);
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'content-type, x-player-id, x-session-token');
+  res.setHeader('Access-Control-Max-Age', '86400');
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   try {
     const { pathname } = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
     if (!pathname.startsWith('/api/')) {
