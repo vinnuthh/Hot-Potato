@@ -72,7 +72,7 @@ export function addPlayer(room, rawName, now = Date.now()) {
     joinedAt: now,
   };
   room.players.set(player.id, player);
-  if (!room.hostId) room.hostId = player.id;
+  if (!room.hostId || !room.players.has(room.hostId)) room.hostId = player.id;
   room.updatedAt = now;
   return { player, token };
 }
@@ -121,6 +121,7 @@ export function startMatch(room, now = Date.now(), random = Math.random) {
     player.lives = STARTING_LIVES;
     player.status = 'ALIVE';
     player.ready = false;
+    player.eliminatedAt = null;
   }
   room.game = {
     matchId: room.matchId,
@@ -224,7 +225,9 @@ export function passBomb(room, { playerId, targetId, version, now = Date.now() }
   const explosion = resolveOverdue(room, now);
   if (explosion) return { ok: false, expired: true, explosion };
 
-  if (game.status !== 'ACTIVE') fail('Round is not active', 'ROUND_NOT_ACTIVE');
+  if (game.status !== 'ACTIVE') {
+    return { ok: false, expired: true, explosion: null };
+  }
   if (!Number.isInteger(version) || version !== game.stateVersion) {
     fail('That action came from an outdated screen', 'STALE_VERSION');
   }
@@ -272,12 +275,53 @@ export function resetToLobby(room, now = Date.now()) {
 export function transferHost(room) {
   const current = room.players.get(room.hostId);
   if (current?.connected) return false;
-  const candidates = [...room.players.values()]
+  let candidates = [...room.players.values()]
     .filter((p) => p.connected && (room.status !== 'PLAYING' || p.status === 'ALIVE'))
     .sort((a, b) => a.joinedAt - b.joinedAt);
-  if (!candidates.length) return false;
+
+  if (!candidates.length && !current) {
+    candidates = [...room.players.values()]
+      .filter((p) => room.status !== 'PLAYING' || p.status === 'ALIVE')
+      .sort((a, b) => a.joinedAt - b.joinedAt);
+  }
+
+  if (!candidates.length) {
+    if (!current) room.hostId = null;
+    return false;
+  }
   room.hostId = candidates[0].id;
   return true;
+}
+
+export function removePlayer(room, playerId, now = Date.now()) {
+  const player = room.players.get(playerId);
+  if (!player) return null;
+
+  if (room.status === 'PLAYING') {
+    if (player.status === 'ALIVE') {
+      player.status = 'ELIMINATED';
+      player.lives = 0;
+      player.eliminatedAt = now;
+      event(room, 'ELIMINATION', player.id, null, now);
+    }
+
+    let explosion = null;
+    if (room.game && room.game.status === 'ACTIVE' && room.game.holderId === player.id) {
+      room.game.secretExplosionAt = now;
+      explosion = resolveOverdue(room, now);
+    }
+    if (alivePlayers(room).length <= 1) {
+      finishMatch(room, now);
+    }
+    transferHost(room);
+    room.updatedAt = now;
+    return { eliminated: true, explosion, matchFinished: room.status === 'FINISHED' };
+  }
+
+  room.players.delete(playerId);
+  transferHost(room);
+  room.updatedAt = now;
+  return { eliminated: false, explosion: null, matchFinished: false };
 }
 
 /**

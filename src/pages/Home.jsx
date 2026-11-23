@@ -71,6 +71,7 @@ export default function Home() {
                   onChange={(event) => setCode(event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5))}
                   placeholder="ABC23"
                   autoComplete="off"
+                  minLength={5}
                   maxLength={5}
                   required
                 />

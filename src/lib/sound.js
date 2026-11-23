@@ -16,8 +16,20 @@ function audio() {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   if (!AudioContext) return null;
   context ??= new AudioContext();
-  if (context.state === 'suspended') context.resume();
+  if (context.state === 'suspended') {
+    context.resume().catch(() => {});
+  }
   return context;
+}
+
+if (typeof window !== 'undefined') {
+  const unlockAudio = () => {
+    if (context && context.state === 'suspended') {
+      context.resume().catch(() => {});
+    }
+  };
+  window.addEventListener('click', unlockAudio, { once: true, passive: true });
+  window.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
 }
 
 function tone({ frequency, duration, type = 'sine', volume = 0.07, slideTo = null, delay = 0 }) {

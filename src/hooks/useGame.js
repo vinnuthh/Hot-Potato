@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { api, connectGameSocket, getSession } from '../lib/api';
+import { api, clearSession, connectGameSocket, getSession, saveSession } from '../lib/api';
 import { sound } from '../lib/sound';
 
 export function useGame(code) {
@@ -27,12 +27,22 @@ export function useGame(code) {
       .getState(code, validSession)
       .then((next) => {
         if (!active) return;
-        setState(next);
+        setState((current) => {
+          if (current?.game && next?.game && (current.game.version ?? 0) > (next.game.version ?? 0)) {
+            return current;
+          }
+          return next;
+        });
         lastVersion.current = next.game?.version ?? null;
         setError(null);
       })
       .catch((err) => {
-        if (active) setError(err.message);
+        if (active) {
+          setError(err.message);
+          if (err.message.includes('not found') || err.message.includes('expired')) {
+            clearSession();
+          }
+        }
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -94,18 +104,33 @@ export function useGame(code) {
       pass: (targetId, version) => run((session) => api.pass(code, session, targetId, version)),
       check: () => run((session) => api.check(code, session)).catch(() => undefined),
       playAgain: () => run((session) => api.playAgain(code, session)),
-      leave: () =>
-        run((session) => api.leave(code, session))
-          .then(() => {
-            localStorage.removeItem('hot-potato-session');
-            setSession(null);
-          })
-          .catch(() => undefined),
+      leave: async () => {
+        try {
+          await run((session) => api.leave(code, session));
+        } catch {
+          // Even if server call fails, cleanly clear session locally
+        } finally {
+          clearSession();
+          setSession(null);
+        }
+      },
     }),
     [code, run],
   );
 
+  const join = useCallback(
+    async (name) => {
+      const result = await api.joinRoom(code, name);
+      const newSession = { code: result.code, playerId: result.playerId, token: result.token, name: name.trim() };
+      saveSession(newSession);
+      setSession(newSession);
+      setError(null);
+      return result;
+    },
+    [code],
+  );
+
   const me = state?.players.find((player) => player.id === validSession?.playerId) ?? null;
 
-  return { state, me, session: validSession, loading, error, connected, explosion, actions };
+  return { state, me, session: validSession, loading, error, connected, explosion, actions, join };
 }

@@ -3,12 +3,12 @@ import { m } from 'framer-motion';
 import PlayerCard from '../components/PlayerCard';
 
 export default function Winner({ state, me, actions }) {
-  const winner = state.players.find((player) => player.id === state.game.winnerId);
+  const winner = state.players.find((player) => player.id === state.game?.winnerId);
   const isWinner = winner?.id === me.id;
   const standings = [...state.players].sort((a, b) => {
     if (a.status !== b.status) return a.status === 'ALIVE' ? -1 : 1;
     if (a.status === 'ALIVE') return b.lives - a.lives;
-    return (a.eliminatedAt ?? 0) - (b.eliminatedAt ?? 0);
+    return (b.eliminatedAt ?? 0) - (a.eliminatedAt ?? 0);
   });
 
   return (
@@ -17,7 +17,7 @@ export default function Winner({ state, me, actions }) {
         <m.div className="trophy" initial={{ scale: 0.4, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, delay: 0.15 }}>
           <Trophy size={58} fill="currentColor" />
         </m.div>
-        <span className="eyebrow">MATCH COMPLETE · {state.game.round} ROUNDS</span>
+        <span className="eyebrow">MATCH COMPLETE · {state.game?.round ?? 1} ROUNDS</span>
         <h1>{isWinner ? 'You survived!' : `${winner?.name ?? 'Nobody'} wins!`}</h1>
         <p className="muted">
           {isWinner ? 'Last player standing. Nobody could take the heat.' : 'Better luck next round — keep passing that bomb.'}
@@ -42,7 +42,7 @@ export default function Winner({ state, me, actions }) {
           {standings.map((player, index) => (
             <div key={player.id} className="standing-row">
               <span className="rank">#{index + 1}</span>
-              <PlayerCard player={player} isMe={player.id === me.id} isHolder={player.id === winner?.id} compact />
+              <PlayerCard player={player} isMe={player.id === me.id} isWinner={player.id === winner?.id} compact />
             </div>
           ))}
         </div>

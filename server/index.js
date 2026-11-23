@@ -5,11 +5,13 @@ import {
   GameError,
   ROUND_BREAK_MS,
   addPlayer,
+  alivePlayers,
   createRoom,
   findPlayerByToken,
   passBomb,
   pruneDisconnected,
   publicState,
+  removePlayer,
   resetToLobby,
   resolveOverdue,
   setConnection,
@@ -83,6 +85,7 @@ function handleExplosion(room, result, now = Date.now()) {
     victimId: result.victimId,
     victimName: result.victimName,
     eliminated: result.eliminated,
+    matchFinished: Boolean(result.matchFinished),
   });
   broadcast(room);
 
@@ -250,15 +253,19 @@ async function handleApi(req, res, pathname) {
     }
 
     if (action === 'leave' && method === 'POST') {
-      room.players.delete(player.id);
-      transferHost(room);
-      if (room.players.size === 0) {
+      const result = removePlayer(room, player.id, Date.now());
+      if (result?.explosion) {
+        handleExplosion(room, result.explosion);
+      }
+      if (room.players.size === 0 || (room.status === 'PLAYING' && alivePlayers(room).length === 0)) {
         clearRoomTimers(room.code);
         rooms.delete(room.code);
       } else {
-        scheduleResolution(room);
+        if (!result?.explosion) {
+          scheduleResolution(room);
+        }
+        broadcast(room);
       }
-      broadcast(room);
       return sendJSON(res, 200, { ok: true });
     }
   }
@@ -335,6 +342,12 @@ wss.on('connection', (ws) => {
   if (!sockets.has(room.code)) sockets.set(room.code, new Set());
   sockets.get(room.code).add(ws);
   setConnection(room, ws.playerId, true);
+
+  const currentHost = room.players.get(room.hostId);
+  if (!currentHost || !currentHost.connected) {
+    transferHost(room);
+  }
+
   broadcast(room);
 
   ws.on('message', (raw) => {
@@ -350,8 +363,15 @@ wss.on('connection', (ws) => {
     const currentRoom = rooms.get(ws.roomCode);
     if (!currentRoom) return;
     sockets.get(ws.roomCode)?.delete(ws);
-    setConnection(currentRoom, ws.playerId, false);
-    transferHost(currentRoom);
+
+    const stillConnected = [...(sockets.get(ws.roomCode) ?? [])].some(
+      (s) => s.playerId === ws.playerId && s.readyState === WebSocket.OPEN,
+    );
+
+    if (!stillConnected) {
+      setConnection(currentRoom, ws.playerId, false);
+      transferHost(currentRoom);
+    }
     broadcast(currentRoom);
   });
 });

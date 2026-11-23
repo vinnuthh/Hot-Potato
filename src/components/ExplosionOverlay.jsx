@@ -22,7 +22,13 @@ export default function ExplosionOverlay({ explosion }) {
             <Zap size={64} fill="currentColor" />
             <span className="eyebrow">BOOM · ROUND {explosion.round}</span>
             <h2>{explosion.victimName}</h2>
-            <p>{explosion.eliminated ? 'Eliminated — now spectating' : 'Lost one life'}</p>
+            <p>
+              {explosion.matchFinished
+                ? 'Final elimination — match complete!'
+                : explosion.eliminated
+                ? 'Eliminated — now spectating'
+                : 'Lost one life'}
+            </p>
           </m.div>
         </m.div>
       )}

@@ -15,10 +15,11 @@ export default function RoomCode({ code, compact = false }) {
   };
 
   const share = async () => {
-    const payload = { title: 'Join my HOT POTATO room', text: `Join my room with code ${code}` };
+    const url = `${window.location.origin}/room/${code}`;
+    const payload = { title: 'HOT POTATO', text: `Join my HOT POTATO room with code ${code}!`, url };
     try {
       if (navigator.share) await navigator.share(payload);
-      else await navigator.clipboard.writeText(code);
+      else await navigator.clipboard.writeText(url);
     } catch {
       // User cancelled the share sheet.
     }

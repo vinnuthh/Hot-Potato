@@ -10,6 +10,7 @@ import {
   passBomb,
   publicState,
   pruneDisconnected,
+  removePlayer,
   resetToLobby,
   resolveOverdue,
   setConnection,
@@ -183,4 +184,34 @@ test('disconnected players get a grace window, then the host is transferred', ()
   assert.deepEqual(pruneDisconnected(room, 15_000, now + 15_000), [first.player.id]);
   assert.equal(room.hostId, second.player.id);
   assert.equal(transferHost(room), false);
+});
+
+test('removePlayer cleans up lobby players and transfers host', () => {
+  const { room, sessions } = makeRoom(2);
+  const [first, second] = sessions;
+  assert.equal(room.hostId, first.player.id);
+  const res = removePlayer(room, first.player.id, now);
+  assert.equal(res.eliminated, false);
+  assert.equal(room.players.has(first.player.id), false);
+  assert.equal(room.hostId, second.player.id);
+});
+
+test('removePlayer eliminates player during match and resolves if holder', () => {
+  const { room } = makeRoom(3);
+  start(room);
+  const holder = room.game.holderId;
+  const nonHolder = [...room.players.keys()].find((id) => id !== holder);
+
+  // Non-holder leaves
+  const res1 = removePlayer(room, nonHolder, now);
+  assert.equal(res1.eliminated, true);
+  assert.equal(room.players.get(nonHolder).status, 'ELIMINATED');
+  assert.equal(res1.matchFinished, false);
+
+  // Holder leaves -> forces explosion and finishes match because only 1 alive left
+  const res2 = removePlayer(room, holder, now);
+  assert.equal(res2.eliminated, true);
+  assert.ok(res2.explosion);
+  assert.equal(res2.matchFinished, true);
+  assert.equal(room.status, 'FINISHED');
 });
