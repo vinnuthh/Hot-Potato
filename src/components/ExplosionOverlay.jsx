@@ -1,46 +1,36 @@
 import { AnimatePresence, m } from 'framer-motion';
-import { Flame, Skull, Zap } from 'lucide-react';
+import { Flame, Zap } from 'lucide-react';
 
 export default function ExplosionOverlay({ explosion }) {
   return (
     <AnimatePresence>
       {explosion && (
         <m.div
-          className="explosion-overlay aviator-crash-overlay"
+          className="explosion-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
+          transition={{ duration: 0.18 }}
         >
-          {/* Expanding shockwaves */}
-          <div className="crash-shockwave-ring ring-1" />
-          <div className="crash-shockwave-ring ring-2" />
-
           <m.div
-            className="explosion-card aviator-crash-card"
-            initial={{ scale: 0.5, rotate: -6 }}
-            animate={{ scale: [0.5, 1.08, 1], rotate: [-6, 2, 0] }}
-            exit={{ scale: 1.25, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 20 }}
+            className="explosion-card"
+            initial={{ scale: 0.6, rotate: -8 }}
+            animate={{ scale: 1, rotate: 0 }}
+            exit={{ scale: 1.2, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 18 }}
           >
-            <div className="crash-icon-wrap">
-              <Zap size={60} fill="currentColor" className="crash-zap" />
-              <Flame size={32} className="crash-fire" />
+            <div className="explosion-icon-wrap">
+              <Zap size={68} fill="currentColor" />
             </div>
-            <span className="eyebrow crash-eyebrow">
-              💥 BLAST CRASH · ROUND {explosion.round}
-            </span>
-            <h2 className="crash-victim">{explosion.victimName}</h2>
-            <div className="crash-status-pill">
-              {explosion.eliminated && <Skull size={15} />}
-              <span>
-                {explosion.matchFinished
-                  ? 'Final elimination — match complete!'
-                  : explosion.eliminated
-                  ? 'Eliminated — now spectating'
-                  : 'Detonated! Lost 1 life'}
-              </span>
-            </div>
+            <span className="eyebrow">BOOM · ROUND {explosion.round}</span>
+            <h2>{explosion.victimName}</h2>
+            <p className="explosion-status">
+              {explosion.matchFinished
+                ? 'Final elimination — Match complete!'
+                : explosion.eliminated
+                ? 'Eliminated — Now spectating'
+                : 'Lost one life!'}
+            </p>
           </m.div>
         </m.div>
       )}

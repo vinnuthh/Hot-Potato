@@ -162,12 +162,43 @@ export function startRound(room, now = Date.now(), random = Math.random) {
   return { holderId: holder.id, round: room.game.roundNumber };
 }
 
+/**
+ * Aviator Crash Algorithm for Detonation Timing:
+ * Follows the Pareto/heavy-tailed distribution used by crash games (Aviator).
+ *
+ * Characteristics:
+ * - ~6% instant-crash probability where the bomb explodes at base minimum fuse (~5s).
+ * - Multiplier formula: M = 0.94 / (1 - r) for r in [0, 1).
+ * - Time logarithmic curve: T = minSeconds + ln(M) / k
+ * - ~60% of fuses explode quickly (< 10s), creating ruthless rapid-pass panic.
+ * - ~25% survive between 10s and 18s.
+ * - ~15% survive up to max cap (30s), creating extreme endurance sweat.
+ */
 export function fuseDuration(random = Math.random) {
   const min = readIntEnv('FUSE_MIN_SECONDS', 5);
   const max = readIntEnv('FUSE_MAX_SECONDS', 30);
   const lower = Math.max(1, Math.min(min, max));
   const upper = Math.max(lower, max);
-  return (lower + Math.floor(random() * (upper - lower + 1))) * 1000;
+
+  const r = random();
+
+  // Instant crash threshold (~6% chance): Sudden detonation at lower bound
+  if (r <= 0.06) {
+    return lower * 1000;
+  }
+
+  // Crash multiplier (Aviator formula)
+  const crashMultiplier = 0.94 / Math.max(0.0001, 1 - r);
+
+  // Calibrate growth constant k so 99th percentile maps to upper bound
+  // ln(0.94 / 0.01) = ln(94) ≈ 4.54329
+  const span = upper - lower;
+  const k = span > 0 ? 4.54329 / span : 1;
+
+  const seconds = lower + Math.log(Math.max(1, crashMultiplier)) / k;
+  const clampedSeconds = Math.min(upper, Math.max(lower, seconds));
+
+  return Math.round(clampedSeconds * 1000);
 }
 
 function readIntEnv(name, fallback) {

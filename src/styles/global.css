@@ -253,394 +253,114 @@ p { margin: 0; }
 .status-chip svg { color: var(--green); }
 .lives-chip svg { color: var(--red); }
 .game-main { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 22px; align-items: stretch; }
-/* Aviator Bomb Stage */
-.aviator-stage {
+/* Bomb Stage */
+.bomb-stage {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 440px;
-  padding: 24px 24px 28px;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  background: radial-gradient(circle at 60% 30%, #171822 0%, #0a0b0f 75%);
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-.aviator-stage.safe { border-color: rgba(61, 220, 140, 0.3); }
-.aviator-stage.warm { border-color: rgba(255, 209, 59, 0.45); box-shadow: 0 0 35px rgba(255, 209, 59, 0.12); }
-.aviator-stage.warning { border-color: rgba(255, 145, 56, 0.6); box-shadow: 0 0 45px rgba(255, 145, 56, 0.22); }
-.aviator-stage.critical {
-  border-color: #ff3b30;
-  box-shadow: 0 0 60px rgba(255, 59, 48, 0.45), inset 0 0 30px rgba(255, 59, 48, 0.15);
-  animation: stage-pulse 0.6s infinite alternate;
-}
-.aviator-stage.crashed {
-  border-color: #ff1e1e;
-  background: radial-gradient(circle at 50% 50%, #2a0e0e 0%, #0a0b0f 80%);
-  box-shadow: 0 0 80px rgba(255, 30, 30, 0.5);
-}
-.aviator-stage.is-me-holding {
-  border-color: #ff453a;
-  box-shadow: 0 0 50px rgba(255, 69, 58, 0.35);
-}
-@keyframes stage-pulse {
-  from { box-shadow: 0 0 30px rgba(255, 59, 48, 0.3); }
-  to { box-shadow: 0 0 70px rgba(255, 59, 48, 0.6), inset 0 0 40px rgba(255, 59, 48, 0.25); }
-}
-
-/* Aviator Flight Grid Backdrop */
-.aviator-grid {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.35;
-}
-.grid-line {
-  position: absolute;
-  left: 20px;
-  right: 20px;
-  border-top: 1px dashed rgba(255, 255, 255, 0.12);
-  display: flex;
-  justify-content: flex-end;
-}
-.line-1 { top: 22%; }
-.line-2 { top: 44%; }
-.line-3 { top: 66%; }
-.line-4 { top: 88%; }
-.grid-label {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.3);
-  margin-top: -16px;
-  letter-spacing: 0.05em;
-}
-.grid-axis-v {
-  position: absolute;
-  top: 15px;
-  bottom: 25px;
-  border-left: 1px dashed rgba(255, 255, 255, 0.06);
-}
-.v-1 { left: 28%; }
-.v-2 { left: 56%; }
-.v-3 { left: 84%; }
-
-/* SVG Trajectory */
-.aviator-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-}
-.aviator-path {
-  filter: drop-shadow(0 0 8px currentColor);
-  transition: stroke 0.2s;
-}
-.aviator-area {
-  transition: fill 0.2s;
-}
-
-/* Badge Row */
-.aviator-badge-row {
-  position: relative;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.aviator-status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 12px;
-  border-radius: 100px;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  backdrop-filter: blur(8px);
-}
-.aviator-status-pill.safe {
-  background: rgba(61, 220, 140, 0.12);
-  color: #3ddc8c;
-  border: 1px solid rgba(61, 220, 140, 0.3);
-}
-.aviator-status-pill.warm {
-  background: rgba(255, 209, 59, 0.12);
-  color: #ffd13b;
-  border: 1px solid rgba(255, 209, 59, 0.3);
-}
-.aviator-status-pill.warning {
-  background: rgba(255, 145, 56, 0.15);
-  color: #ff9138;
-  border: 1px solid rgba(255, 145, 56, 0.4);
-}
-.aviator-status-pill.critical, .aviator-status-pill.crashed {
-  background: rgba(255, 59, 48, 0.2);
-  color: #ff453a;
-  border: 1px solid rgba(255, 59, 48, 0.5);
-  animation: beacon-blink 0.5s infinite alternate;
-}
-.beacon-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 8px currentColor;
-}
-@keyframes beacon-blink {
-  from { opacity: 0.6; }
-  to { opacity: 1; filter: drop-shadow(0 0 8px currentColor); }
-}
-.danger-alert-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 100px;
-  background: #ff3b30;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  box-shadow: 0 0 20px rgba(255, 59, 48, 0.5);
-  animation: pulse-alert 0.6s infinite alternate;
-}
-@keyframes pulse-alert {
-  from { transform: scale(1); }
-  to { transform: scale(1.05); }
-}
-
-/* Giant Aviator Multiplier */
-.aviator-multiplier-wrap {
-  position: relative;
-  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: auto 0;
-  text-align: center;
+  min-height: 420px;
+  padding: 30px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 40%, #252021, #111216 70%);
+  overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
-.aviator-multiplier {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: clamp(80px, 15vw, 130px);
-  font-weight: 900;
-  line-height: 0.88;
-  letter-spacing: -0.01em;
-  text-shadow: 0 0 35px currentColor, 0 10px 40px rgba(0, 0, 0, 0.7);
-  user-select: none;
+.bomb-stage.is-live {
+  border-color: rgba(255, 59, 48, 0.4);
+  box-shadow: 0 0 40px rgba(255, 59, 48, 0.12);
 }
-.aviator-multiplier.is-crashed {
-  text-shadow: 0 0 50px #ff1e1e;
+.bomb-stage.is-holding {
+  border-color: #ff3b30;
+  box-shadow: 0 0 50px rgba(255, 59, 48, 0.35), inset 0 0 25px rgba(255, 59, 48, 0.1);
+  animation: holding-pulse 1s infinite alternate;
 }
-.mult-suffix {
-  font-size: 0.65em;
-  margin-left: 2px;
-  opacity: 0.85;
+@keyframes holding-pulse {
+  from { border-color: #ff3b30; box-shadow: 0 0 30px rgba(255, 59, 48, 0.25); }
+  to { border-color: #ff6b60; box-shadow: 0 0 60px rgba(255, 59, 48, 0.5), inset 0 0 30px rgba(255, 59, 48, 0.2); }
 }
-.crash-banner {
-  margin-top: 12px;
-}
-.crash-tag {
+
+.holder-live-alert {
+  position: absolute;
+  top: 20px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 8px;
-  background: rgba(255, 30, 30, 0.2);
-  border: 1px solid rgba(255, 30, 30, 0.5);
-  color: #ff6b6b;
-  font-size: 12px;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 100px;
+  background: #ff3b30;
+  color: #fff;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.1em;
-  box-shadow: 0 0 24px rgba(255, 30, 30, 0.35);
+  box-shadow: 0 0 25px rgba(255, 59, 48, 0.6);
+  z-index: 3;
+  animation: alert-shake 0.8s infinite alternate;
 }
-.danger-subline {
-  margin-top: 8px;
+.alert-flame {
+  animation: flame-flicker 0.25s infinite alternate;
 }
-.fuse-text {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  color: var(--muted);
-  text-transform: uppercase;
+@keyframes alert-shake {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+@keyframes flame-flicker {
+  from { transform: scale(0.9); }
+  to { transform: scale(1.2); }
 }
 
-/* Floating Aviator Bomb on Trajectory */
-.aviator-projectile {
+.bomb-glow {
   position: absolute;
-  z-index: 4;
-  width: 50px;
-  height: 50px;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  transition: left 0.1s linear, top 0.1s linear;
-}
-.projectile-glow {
-  position: absolute;
-  width: 70px;
-  height: 70px;
+  width: 280px;
+  height: 280px;
   border-radius: 50%;
-  filter: blur(14px);
-  opacity: 0.65;
-  transition: background 0.2s;
+  background: radial-gradient(circle, rgba(255, 59, 48, 0.28), transparent 68%);
+  pointer-events: none;
 }
-.projectile-bomb {
+.bomb-core {
   position: relative;
-  z-index: 2;
-  color: #fff;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.8));
+  color: #f3f4f6;
+  filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.6));
 }
-.rocket-exhaust {
+.bomb-core svg { display: block; }
+.spark {
   position: absolute;
-  bottom: 0;
-  left: 6px;
-  width: 14px;
-  height: 14px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--orange);
-  box-shadow: 0 0 16px 6px rgba(255, 145, 56, 0.85);
-  animation: exhaust-flicker 0.18s infinite alternate;
+  box-shadow: 0 0 16px 5px rgba(255, 145, 56, 0.7);
+  animation: spark-flicker 0.4s infinite alternate;
 }
-.rocket-exhaust.two {
-  left: 2px;
-  bottom: -4px;
-  width: 9px;
-  height: 9px;
-  background: var(--red);
-  box-shadow: 0 0 12px 4px rgba(255, 59, 48, 0.9);
-  animation-duration: 0.12s;
+.spark-one { top: 12px; right: 20px; }
+.spark-two { top: 27px; right: 8px; width: 5px; height: 5px; background: var(--red); animation-duration: 0.25s; }
+.spark-three { top: 6px; right: 30px; width: 6px; height: 6px; background: #ffd13b; animation-duration: 0.2s; }
+@keyframes spark-flicker {
+  from { opacity: 0.5; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1.3); }
 }
-@keyframes exhaust-flicker {
-  from { transform: scale(0.7) translateY(0); opacity: 0.6; }
-  to { transform: scale(1.3) translateY(4px); opacity: 1; }
-}
-
-/* Blast Shockwave */
-.blast-shockwave {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 220px;
-  height: 220px;
-  margin-left: -110px;
-  margin-top: -110px;
-  border-radius: 50%;
-  border: 4px solid #ff3b30;
-  box-shadow: 0 0 40px #ff3b30, inset 0 0 40px #ff3b30;
-  pointer-events: none;
-  z-index: 5;
-}
-.blast-flash {
-  position: absolute;
-  inset: 0;
-  background: #ff3b30;
-  pointer-events: none;
-  z-index: 6;
-}
-
-/* Aviator Caption */
-.aviator-caption {
+.bomb-caption {
   position: relative;
-  z-index: 3;
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: grid;
   gap: 3px;
   text-align: center;
+  margin-top: 28px;
 }
-.aviator-caption strong {
+.bomb-caption strong {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 38px;
+  font-size: 42px;
   line-height: 1;
 }
-.is-me-text {
+.bomb-caption strong.holder-highlight {
   color: var(--orange);
-  text-shadow: 0 0 18px rgba(255, 145, 56, 0.5);
+  text-shadow: 0 0 20px rgba(255, 145, 56, 0.5);
 }
-
-/* Aviator Crash Fullscreen Overlay */
-.aviator-crash-overlay {
-  background: radial-gradient(circle, rgba(255, 30, 30, 0.35) 0%, rgba(8, 8, 10, 0.94) 75%);
-  backdrop-filter: blur(8px);
-}
-.crash-shockwave-ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 59, 48, 0.4);
-  pointer-events: none;
-  animation: shockwave-expand 1.8s infinite cubic-bezier(0.1, 0.8, 0.3, 1);
-}
-.ring-1 { width: 340px; height: 340px; }
-.ring-2 { width: 560px; height: 560px; animation-delay: 0.3s; }
-@keyframes shockwave-expand {
-  0% { transform: scale(0.3); opacity: 1; }
-  100% { transform: scale(1.6); opacity: 0; }
-}
-.aviator-crash-card {
-  position: relative;
-  z-index: 2;
-  padding: 36px 32px;
-  border-radius: 24px;
-  background: linear-gradient(165deg, rgba(35, 15, 15, 0.95), rgba(14, 10, 12, 0.95));
-  border: 2px solid rgba(255, 59, 48, 0.6);
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.8), 0 0 60px rgba(255, 59, 48, 0.4);
-  display: grid;
-  justify-items: center;
-  gap: 12px;
-}
-.crash-icon-wrap {
-  position: relative;
-  display: grid;
-  place-items: center;
-  margin-bottom: 6px;
-}
-.crash-zap {
-  color: var(--orange);
-  filter: drop-shadow(0 0 20px rgba(255, 145, 56, 0.8));
-}
-.crash-fire {
-  position: absolute;
-  bottom: -6px;
-  color: var(--red);
-  filter: drop-shadow(0 0 14px rgba(255, 59, 48, 0.8));
-}
-.crash-eyebrow {
-  color: #ff9138;
+.bomb-caption .fuse-note {
+  color: var(--muted);
   font-size: 12px;
-  letter-spacing: 0.22em;
 }
-.crash-victim {
-  font-size: clamp(48px, 9vw, 84px);
-  line-height: 0.95;
-  color: #fff;
-  text-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
-  margin: 0;
-}
-.crash-status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 100px;
-  background: rgba(255, 59, 48, 0.18);
-  border: 1px solid rgba(255, 59, 48, 0.4);
-  color: #ffb3ad;
-  font-size: 14px;
-  font-weight: 800;
-  margin-top: 4px;
-}
-.bomb-caption .fuse-note { color: var(--muted); font-size: 12px; }
 .pass-panel { display: flex; flex-direction: column; }
 .pass-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
 .pass-panel-head h2 { font-size: 30px; margin-top: 4px; }
@@ -684,8 +404,9 @@ p { margin: 0; }
   backdrop-filter: blur(3px);
 }
 .explosion-card { display: grid; justify-items: center; gap: 8px; text-align: center; color: var(--orange); }
+.explosion-icon-wrap { color: var(--orange); filter: drop-shadow(0 0 18px rgba(255, 145, 56, 0.7)); }
 .explosion-card h2 { font-size: clamp(48px, 10vw, 96px); color: var(--text); }
-.explosion-card p { color: #ffc7a3; font-size: 15px; font-weight: 700; }
+.explosion-card p, .explosion-status { color: #ffc7a3; font-size: 15px; font-weight: 700; }
 .toast {
   position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 40;
   display: flex; align-items: center; gap: 9px;
